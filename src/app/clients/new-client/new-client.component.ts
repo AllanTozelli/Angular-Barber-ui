@@ -29,7 +29,7 @@ export class NewClientComponent implements OnDestroy{
   constructor(
     @Inject(SERVICES_TOKEN.HTTP.CLIENT)private readonly httpService: IClientService,
     @Inject(SERVICES_TOKEN.SNACKBAR) private readonly snackBarManager: ISnackbarManagerService,
-  private readonly router: Router
+    private readonly router: Router
   ){ }
   
   ngOnDestroy(): void {
