@@ -6,8 +6,8 @@ export interface ClientModelForm {
 }
 
 export interface ClientModelTable {
-    id: []
-    name: []
-    email: []
-    phone: []
+    id: number
+    name: string
+    email: string
+    phone: string
 }
