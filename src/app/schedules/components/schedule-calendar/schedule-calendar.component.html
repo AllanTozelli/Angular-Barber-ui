@@ -55,15 +55,15 @@
 
         <div class="col-6">
             <table mat-table [dataSource]="dataSource" class="mat-elevation-z8">
-                <ng-container>
+                <ng-container matColumnDef="startAt">
                     <th mat-header-cell *matHeaderCellDef>Inicio</th>
                     <td mat-cell *matCellDef="let schedule">{{schedule.startAt | date: 'HH:mm a'}}</td>
                 </ng-container>
-                <ng-container>
+                <ng-container matColumnDef="endAt">
                     <th mat-header-cell *matHeaderCellDef>Término</th>
                     <td mat-cell *matCellDef="let schedule">{{schedule.endAt | date: 'HH:mm a'}}</td>
                 </ng-container>
-                <ng-container>
+                <ng-container matColumnDef="client">
                     <th mat-header-cell *matHeaderCellDef>Cliente</th>
                     <td mat-cell *matCellDef="let schedule">{{schedule.clientName}}</td>
                 </ng-container>
