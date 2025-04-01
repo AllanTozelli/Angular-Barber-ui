@@ -3,7 +3,7 @@ import { ClientModelTable } from '../../client.models';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { MatPaginator, MatPaginatorIntl, PageEvent } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
-import { EventEmitter } from '@angular/core';  // Certifique-se de importar EventEmitter
+import { EventEmitter } from '@angular/core';
 import { SERVICES_TOKEN } from '../../../services/service.token';
 import { IDialogManagerService } from '../../../services/idialog-manager.service';
 import { DialogManagerService } from '../../../services/dialog-manager.service';
@@ -14,44 +14,42 @@ import { CustomPaginator } from './custom-paginator';
 
 @Component({
   selector: 'app-client-table',
-  imports: [MatIconModule, MatPaginatorModule,MatTableModule],
+  imports: [MatIconModule, MatPaginatorModule, MatTableModule],
   templateUrl: './client-table.component.html',
   styleUrls: ['./client-table.component.scss'],
-  providers: [{ provide: SERVICES_TOKEN.DIALOG, useClass: DialogManagerService },
-    {provide: MatPaginatorIntl, useClass: CustomPaginator}
+  providers: [
+    { provide: SERVICES_TOKEN.DIALOG, useClass: DialogManagerService },
+    { provide: MatPaginatorIntl, useClass: CustomPaginator }
   ]
 })
 export class ClientTableComponent implements AfterViewInit, OnChanges, OnDestroy {
-onPageChange($event: PageEvent) {
-throw new Error('Method not implemented.');
-}
-
+  
   @Input() clients: ClientModelTable[] = [];
+  @Output() OnConfirmDelete = new EventEmitter<ClientModelTable>(); 
+  @Output() OnRequestUpdate = new EventEmitter<ClientModelTable>();
 
   dataSource!: MatTableDataSource<ClientModelTable>;
+  displayedColumns: string[] = ['name', 'email', 'phone', 'actions'];
 
   @ViewChild(MatPaginator) paginator!: MatPaginator;
 
-  displayedColumns: string[] = ['name', 'email', 'phone', 'actions'];
-
   private dialogManagerServiceSubscription?: Subscription;
-
-  // Corrigir o tipo do EventEmitter
-  @Output() OnConfirmDelete = new EventEmitter<ClientModelTable>();  // Tipo correto
-
-  @Output() OnRequestUpdate = new EventEmitter<ClientModelTable>();  // Tipo correto
 
   constructor(
     @Inject(SERVICES_TOKEN.DIALOG) private readonly dialogManagerService: IDialogManagerService
-  ) { }
+  ) {}
 
   ngAfterViewInit(): void {
+    // Atualiza o paginator após a view ser inicializada
     this.dataSource.paginator = this.paginator;
   }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['clients'] && this.clients) {
+      // Atualiza o dataSource com os novos dados
       this.dataSource = new MatTableDataSource<ClientModelTable>(this.clients);
+
+      // Associa o paginator ao dataSource
       if (this.paginator) {
         this.dataSource.paginator = this.paginator;
       }
@@ -68,18 +66,18 @@ throw new Error('Method not implemented.');
     return `(${phone.substring(0, 2)}) ${phone.substring(2, 7)} - ${phone.substring(7)}`;
   }
 
-  update(client: ClientModelTable){
-    this.OnRequestUpdate.emit(client)
-
+  update(client: ClientModelTable) {
+    this.OnRequestUpdate.emit(client);
   }
 
   delete(client: ClientModelTable): void {
+    // Exibe a caixa de diálogo para confirmação de exclusão
     this.dialogManagerService.showYesNoDialog(
       YesNoDialogComponent,
       { title: 'Exclusão de cliente', content: `Confirma a exclusão do cliente ${client.name}?` }
     ).subscribe(result => {
       if (result) {
-        // Emitir evento para confirmar exclusão
+        // Emite o evento de exclusão
         this.OnConfirmDelete.emit(client);
 
         // Filtra a lista de clientes para excluir o cliente
@@ -91,4 +89,8 @@ throw new Error('Method not implemented.');
     });
   }
 
+  // Método opcional para lidar com mudanças de página (caso necessário)
+  onPageChange($event: PageEvent): void {
+    console.log('Página alterada:', $event);
+  }
 }
